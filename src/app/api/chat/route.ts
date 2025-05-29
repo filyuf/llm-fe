@@ -29,7 +29,7 @@ export async function POST(req: Request) {
    const ollamaApiUrl =
       process.env.MODE === "development"
          ? "http://localhost:11434/api/chat"
-         : `${process.env.NEXT_PUBLIC_API_GATEWAY_URL}/${region}/chat`;
+         : `${process.env.NEXT_PUBLIC_API_GATEWAY_URL}/${region}/api/chat`;
 
    const response = await fetch(ollamaApiUrl, {
       method: "POST",
