@@ -29,7 +29,7 @@ export async function POST(req: Request) {
    const ollamaApiUrl =
       process.env.MODE === "development"
          ? "http://localhost:11434/api/chat"
-         : `${process.env.NEXT_PUBLIC_API_GATEWAY_URL}/${region}/api/chat`;
+         : `${process.env.NEXT_PUBLIC_API_GATEWAY_URL}/${region}/chat`;
 
    const response = await fetch(ollamaApiUrl, {
       method: "POST",
@@ -59,11 +59,17 @@ export async function POST(req: Request) {
          const reader = response.body!.getReader();
          const decoder = new TextDecoder();
          try {
+            let buffer = "";
             while (true) {
                const { done, value } = await reader.read();
                if (done) break;
-               const chunk = decoder.decode(value);
-               const lines = chunk.split("\n");
+               
+               buffer += decoder.decode(value, { stream: true });
+               const lines = buffer.split("\n");
+               
+               // Keep the last part in the buffer as it might be incomplete
+               buffer = lines.pop() || "";
+
                for (const line of lines) {
                   if (line.trim() !== "") {
                      try {
