@@ -59,18 +59,11 @@ export async function POST(req: Request) {
          const reader = response.body!.getReader();
          const decoder = new TextDecoder();
          try {
-            let buffer = "";
             while (true) {
                const { done, value } = await reader.read();
                if (done) break;
-               
-               buffer += decoder.decode(value, { stream: true });
-               const lines = buffer.split("\n");
-               
-               // Keep the last part in the buffer as it might be incomplete
-               buffer = lines.pop() || "";
-
-
+               const chunk = decoder.decode(value);
+               const lines = chunk.split("\n");
                for (const line of lines) {
                   if (line.trim() !== "") {
                      try {
@@ -85,21 +78,6 @@ export async function POST(req: Request) {
                         console.error("Error parsing JSON:", error);
                      }
                   }
-               }
-            }
-
-            // Process any remaining buffer content
-            if (buffer.trim() !== "") {
-               try {
-                  const parsedChunk = JSON.parse(buffer);
-                  if (
-                     parsedChunk.message &&
-                     parsedChunk.message.content
-                  ) {
-                     controller.enqueue(parsedChunk.message.content);
-                  }
-               } catch (error) {
-                  console.error("Error parsing remaining buffer JSON:", error);
                }
             }
          } catch (error) {
