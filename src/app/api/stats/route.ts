@@ -10,7 +10,10 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
    try {
       const { conversations, region, model }: { conversations: VercelChatMessage[], region: string, model: string } = await req.json();
-      const conversationText = formatConversation(conversations);
+      
+      // limit to last 20 messages to avoid context limit
+      const recentConversations = conversations.slice(-20);
+      const conversationText = formatConversation(recentConversations);
 
       const start = Date.now();
       const conversationScore = await scoringWithPrompt(conversationText, region, model);
