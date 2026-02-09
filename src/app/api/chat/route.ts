@@ -70,6 +70,7 @@ export async function POST(req: Request) {
                // Keep the last part in the buffer as it might be incomplete
                buffer = lines.pop() || "";
 
+
                for (const line of lines) {
                   if (line.trim() !== "") {
                      try {
@@ -84,6 +85,21 @@ export async function POST(req: Request) {
                         console.error("Error parsing JSON:", error);
                      }
                   }
+               }
+            }
+
+            // Process any remaining buffer content
+            if (buffer.trim() !== "") {
+               try {
+                  const parsedChunk = JSON.parse(buffer);
+                  if (
+                     parsedChunk.message &&
+                     parsedChunk.message.content
+                  ) {
+                     controller.enqueue(parsedChunk.message.content);
+                  }
+               } catch (error) {
+                  console.error("Error parsing remaining buffer JSON:", error);
                }
             }
          } catch (error) {
