@@ -29,7 +29,8 @@ Respond with a JSON object containing only the scores for user. Ensure all score
    const response = await llmQuery(prompt, region, model);
    const jsonMatch = response.match(/\{[\s\S]*\}/);
    if (!jsonMatch) {
-      throw new Error("Failed to extract JSON from Ollama response");
+      console.error("Failed to parse JSON from response:", response);
+      throw new Error(`Failed to extract JSON from Ollama response. Raw response: ${response}`);
    }
 
    return JSON.parse(jsonMatch[0]) as AssessmentScores;
@@ -65,7 +66,8 @@ Respond with a JSON object containing only the scores. Ensure all scores are int
    const response = await llmQuery(prompt, region, model);
    const jsonMatch = response.match(/\{[\s\S]*\}/);
    if (!jsonMatch) {
-      throw new Error("Failed to extract JSON from Ollama response");
+      console.error("Failed to parse JSON from response:", response);
+      throw new Error(`Failed to extract JSON from Ollama response. Raw response: ${response}`);
    }
 
    return JSON.parse(jsonMatch[0]) as AssessmentScores;
